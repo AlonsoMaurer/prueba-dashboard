@@ -1,0 +1,324 @@
+{
+  "dominio": "rrhh",
+  "idioma": "es",
+  "semilla": 1261389412,
+  "parametros": {
+    "corte": "2025-12-31",
+    "inicio_anio": "2025-01-01",
+    "corte_previo": "2024-12-31",
+    "inicio_previo": "2024-01-01"
+  },
+  "tablas": [
+    {
+      "nombre": "empleados",
+      "filas": 400,
+      "columnas": [
+        {
+          "nombre": "id_empleado",
+          "tipo": "INTEGER",
+          "gen": {
+            "t": "id"
+          }
+        },
+        {
+          "nombre": "departamento",
+          "tipo": "TEXT",
+          "gen": {
+            "t": "categoria",
+            "valores": [
+              "Finanzas",
+              "Tecnología",
+              "Operaciones",
+              "Comercial",
+              "Personas"
+            ],
+            "pesos": [
+              0.15,
+              0.25,
+              0.3,
+              0.2,
+              0.1
+            ]
+          }
+        },
+        {
+          "nombre": "genero",
+          "tipo": "TEXT",
+          "gen": {
+            "t": "categoria",
+            "valores": [
+              "F",
+              "M"
+            ],
+            "pesos": [
+              0.46,
+              0.54
+            ]
+          }
+        },
+        {
+          "nombre": "nivel",
+          "tipo": "INTEGER",
+          "gen": {
+            "t": "entero",
+            "min": 1,
+            "max": 5
+          }
+        },
+        {
+          "nombre": "fecha_ingreso",
+          "tipo": "TEXT",
+          "gen": {
+            "t": "fecha",
+            "desde": "2016-01-01",
+            "hasta": "2025-12-31"
+          }
+        },
+        {
+          "nombre": "fecha_baja",
+          "tipo": "TEXT",
+          "gen": {
+            "t": "fecha_despues",
+            "de": "fecha_ingreso",
+            "dias_min": 120,
+            "dias_max": 1800,
+            "tope": "2025-12-31",
+            "prob_nulo": 0.72
+          }
+        },
+        {
+          "nombre": "salario_base",
+          "tipo": "REAL",
+          "gen": {
+            "t": "real_lineal",
+            "base": 900000,
+            "paso": 450000,
+            "desde": "nivel",
+            "sd": 60000,
+            "ajuste": {
+              "columna": "genero",
+              "por": "nivel",
+              "factores": {
+                "F": {
+                  "1": 0.99,
+                  "2": 0.97,
+                  "3": 0.95,
+                  "4": 0.94,
+                  "5": 0.93
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "nombre": "bandas",
+      "filas_fijas": [
+        [
+          1,
+          1080000,
+          1620000
+        ],
+        [
+          2,
+          1440000,
+          2160000
+        ],
+        [
+          3,
+          1800000,
+          2700000
+        ],
+        [
+          4,
+          2160000,
+          3240000
+        ],
+        [
+          5,
+          2520000,
+          3780000
+        ]
+      ],
+      "columnas": [
+        {
+          "nombre": "nivel",
+          "tipo": "INTEGER",
+          "gen": {
+            "t": "fija"
+          }
+        },
+        {
+          "nombre": "minimo",
+          "tipo": "REAL",
+          "gen": {
+            "t": "fija"
+          }
+        },
+        {
+          "nombre": "maximo",
+          "tipo": "REAL",
+          "gen": {
+            "t": "fija"
+          }
+        }
+      ]
+    },
+    {
+      "nombre": "dotacion_autorizada",
+      "filas": 5,
+      "derivada": {
+        "regla": "cupos",
+        "de": "empleados",
+        "factores": [
+          1.06,
+          1.12,
+          1.18,
+          1.09,
+          1.15
+        ]
+      },
+      "columnas": [
+        {
+          "nombre": "departamento",
+          "tipo": "TEXT",
+          "gen": {
+            "t": "fija"
+          }
+        },
+        {
+          "nombre": "cupos",
+          "tipo": "INTEGER",
+          "gen": {
+            "t": "fija"
+          }
+        }
+      ]
+    },
+    {
+      "nombre": "presupuesto",
+      "filas": 60,
+      "derivada": {
+        "regla": "presupuesto",
+        "de": "empleados",
+        "cupos": "dotacion_autorizada",
+        "meses_con_gasto": 9,
+        "desvio_pct": 3,
+        "deriva_mensual_pct": 0.1
+      },
+      "columnas": [
+        {
+          "nombre": "mes",
+          "tipo": "TEXT",
+          "gen": {
+            "t": "fija"
+          }
+        },
+        {
+          "nombre": "departamento",
+          "tipo": "TEXT",
+          "gen": {
+            "t": "fija"
+          }
+        },
+        {
+          "nombre": "presupuestado",
+          "tipo": "REAL",
+          "gen": {
+            "t": "fija"
+          }
+        },
+        {
+          "nombre": "gasto_real",
+          "tipo": "REAL",
+          "gen": {
+            "t": "fija"
+          }
+        }
+      ]
+    }
+  ],
+  "kpis": [
+    {
+      "id": "dotacion_activa",
+      "forma": "escalar"
+    },
+    {
+      "id": "rotacion_anual",
+      "forma": "escalar"
+    },
+    {
+      "id": "rotacion_mensual",
+      "forma": "serie"
+    },
+    {
+      "id": "dotacion_por_depto",
+      "forma": "categorias"
+    },
+    {
+      "id": "antiguedad_promedio",
+      "forma": "escalar"
+    },
+    {
+      "id": "salario_por_nivel",
+      "forma": "categorias"
+    },
+    {
+      "id": "compa_ratio",
+      "forma": "escalar"
+    },
+    {
+      "id": "fuera_de_banda",
+      "forma": "escalar"
+    },
+    {
+      "id": "brecha_genero",
+      "forma": "escalar"
+    },
+    {
+      "id": "brecha_genero_nivel",
+      "forma": "categorias"
+    },
+    {
+      "id": "gasto_vs_presupuesto",
+      "forma": "escalar"
+    },
+    {
+      "id": "presupuesto_anual",
+      "forma": "escalar"
+    },
+    {
+      "id": "desviacion_por_depto",
+      "forma": "categorias"
+    },
+    {
+      "id": "gasto_mensual",
+      "forma": "serie"
+    },
+    {
+      "id": "proyeccion_cierre",
+      "forma": "escalar"
+    },
+    {
+      "id": "ocupacion_pct",
+      "forma": "escalar"
+    },
+    {
+      "id": "ocupacion_por_depto",
+      "forma": "categorias"
+    },
+    {
+      "id": "vacantes_por_depto",
+      "forma": "categorias"
+    }
+  ],
+  "analisis_python": [
+    {
+      "id": "rotacion_media_movil",
+      "base": "rotacion_mensual",
+      "tipo": "media_movil",
+      "ventana": 3
+    }
+  ]
+}
